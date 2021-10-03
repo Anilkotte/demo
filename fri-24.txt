@@ -1,0 +1,124 @@
+
+https://mail.microcomsolution.com/
+
+
+command.js
+/// <reference types="Cypress" />
+var data = require('../fixtures/commoncentstral.json')
+var locater = require('../integration/commoncentstral_locaters/login_locaters.js')
+var home = require('../integration/commoncentstral_locaters/homepage.js')
+
+
+Cypress.Commands.add('launchapplication', () => {
+   cy.visit(data.url)
+})
+Cypress.Commands.add('login', () => {
+   cy.get(locater.usernameTextfeild).type(data.username)
+   cy.get(locater.passwordTextfeild).type(data.password)
+   cy.get(locater.loginbutton).click()
+})
+Cypress.Commands.add('selectitem', () => {
+   cy.contains(home.buyers).click({ force: true })
+   cy.wait(2000)
+
+   cy.contains(home.purchaseurl).click({ force: true })
+   cy.contains(home.completedbutton).click()
+   cy.wait(5000)
+   cy.contains(home.prname).click()
+   cy.wait(3000)
+
+   cy.get(home.selectbutton).click()
+   cy.get(home.pillatButton).should('be.visible').scrollIntoView().click()
+})
+Cypress.Commands.add('verifyaddbolwindow', () => {
+   cy.get(home.addbolpage).should('be.visible')
+   cy.wait(3000)
+   cy.get(home.selectactiveboldropdown).select(data.activebol)
+   cy.wait(3000)
+   cy.get(home.selectunpickedpallet).select('1 (31.74 LB)')
+   cy.get(home.asinamount).type('5')
+   cy.get(home.confirmbutton).click()
+})
+Cypress.Commands.add('verifyitemadded', () => {
+   cy.contains(home.warehouse).click({ force: true })
+   cy.contains(home.billofleading).click({ force: true })
+   cy.contains(home.bolname).click()
+   cy.contains(home.itemnane).should('be.visible')
+})
+
+testspec.js
+
+
+/// <reference types="Cypress" />
+describe('commoncentstral Assigment', () => {
+
+    beforeEach(() => {
+        
+        cy.viewport(1920, 1080)
+    })
+
+    it('verify the application login', () => {
+        cy.launchapplication()
+    })
+    it('login to the applicaiton', () => {
+        cy.login()
+    })
+    it('select item for moving', () => {
+        cy.selectitem()
+    })
+    it('verify addbol window', () => {
+        cy.verifyaddbolwindow()
+    })
+    it('verify item addedornot', () => {
+        cy.launchapplication()
+        cy.login()
+        cy.verifyitemadded()
+    })
+
+})
+
+
+
+login locaters 
+
+var login = {
+    usernameTextfeild: "#name",
+    passwordTextfeild: "#password",
+    loginbutton: ".button"
+}
+module.exports = login;
+
+
+
+
+homepage locates
+
+
+var homepage = {
+    buyers: ('a', 'Buyers'),
+    purchaseurl: ('.sub-menu-list', 'Purchase'),
+    completedbutton: ('span', 'Completed'),
+    prname: ('a', ' KP092321C '),
+    selectbutton: ":nth-child(1) > :nth-child(1) > [title='Select/Deselect PR Item']",
+    pillatButton: "[class='btn btn-primary ng-star-inserted']",
+    addbolpage: "#modal-basic-title",
+    selectactiveboldropdown: ".v-container > .d-flex > .form-control",
+    selectunpickedpallet: ".d-flex > .ng-pristine",
+    asinamount: ":nth-child(4) > .d-flex > :nth-child(3) > .form-control",
+    confirmbutton: ".modal-footer > .btn-success",
+    warehouse:('a','Warehouse'),
+    billofleading :('a',' Bill of Lading'),
+    bolname:('b','0000000980'),
+    itemnane:('div','Harney and Sons Tea Black organic, 16 oz')
+
+}
+module.exports = homepage;
+json
+
+{
+    "url":"https://dev.commoncentstral.com/login",
+    "username" :"suresh",
+    "password":"1202&&stneC",
+    "activebol":"0000000980",
+    "unpickedpallet:":"1 (31.74 LB)"
+}
